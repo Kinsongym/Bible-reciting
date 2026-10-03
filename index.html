@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聖經背誦練習 App</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #eff6ff;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-color: #d97706;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .app-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            color: var(--text-main);
+            margin: 0 0 6px 0;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .select-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            background-color: var(--primary-light);
+            color: var(--text-main);
+            font-weight: 600;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .info-card {
+            background-color: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .verse-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stats-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: #ffffff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-badge span {
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .bible-display {
+            font-size: 1.3rem;
+            line-height: 2.3;
+            letter-spacing: 0.05em;
+            min-height: 140px;
+            word-break: break-all;
+            padding: 20px;
+            border-radius: 14px;
+            background: #ffffff;
+            border: 1.5px dashed var(--border-color);
+        }
+
+        /* 填充題底線樣式 */
+        .blank {
+            display: inline-block;
+            width: 1.3em;
+            height: 1.1em;
+            border-bottom: 2px solid var(--primary-color);
+            margin: 0 3px;
+            vertical-align: bottom;
+            background-color: rgba(37, 99, 235, 0.04);
+            border-radius: 2px 2px 0 0;
+        }
+
+        /* 標點符號樣式 */
+        .punct {
+            color: var(--text-muted);
+            font-weight: 600;
+            margin: 0 1px;
+        }
+
+        footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <header>
+        <h1>聖經背誦練習</h1>
+        <div class="subtitle">選擇經文出處，測試默想與背誦熟悉度</div>
+    </header>
+
+    <!-- 1. 訪客可選取的預設經文下拉選單 -->
+    <div class="select-group">
+        <label for="verseSelect">選擇預設經文：</label>
+        <select id="verseSelect" onchange="onSelectVerse()">
+            <!-- 選項會由 JS 自動從 adminDatabase 載入 -->
+        </select>
+    </div>
+
+    <!-- 經文統計資訊 -->
+    <div class="info-card">
+        <div class="verse-title" id="verseTitle">--</div>
+        <div class="stats-badge">
+            <span id="charCount">0</span> 字 | <span id="punctCount">0</span> 標點
+        </div>
+    </div>
+
+    <!-- 2. 兩個控制按鈕 -->
+    <div class="btn-group">
+        <button id="btnRandom" class="btn-action" onclick="setMode('random')">隨機填空遮蔽</button>
+        <button id="btnFull" class="btn-action" onclick="setMode('full')">顯示全文</button>
+    </div>
+
+    <!-- 經文顯示區域（預設為全填充題） -->
+    <div class="bible-display" id="displayText"></div>
+
+    <footer>
+        Adm 可隨時在原始碼的 adminDatabase 欄位自由調整經文內容。
+    </footer>
+</div>
+
+<script>
+    // Adm 預先輸入的經文資料庫（包含羅馬書4條核心經文）
+    const adminDatabase = {
+        "羅馬書 3:23": "因為世人都犯了罪，虧缺了神的榮耀；",
+        "羅馬書 5:8": "惟有基督在我們還作罪人的時候為我們死，神的愛就在此向我們顯明了。",
+        "羅馬書 6:23": "因為罪的工價乃是死；惟有神的恩賜，在我們的主基督耶穌裏，乃是永生。",
+        "羅馬書 10:9": "你若口裏認耶穌為主，心裏信神叫祂從死裏復活，就必得救。"
+    };
+
+    let currentVerseText = "";
+    let currentMode = "blank"; // 預設模式：全填充題 (blank)
+
+    // 標點符號判斷式
+    const punctRegex = /[，。；：！？、「」『』（）…—\s\,\\.\\!\\?]/;
+
+    // 初始化：載入下拉選單項目
+    window.onload = function() {
+        const selectEl = document.getElementById("verseSelect");
+        selectEl.innerHTML = "";
+
+        // 動態注入 Adm 預設的經文列表
+        for (let key in adminDatabase) {
+            let option = document.createElement("option");
+            option.value = key;
+            option.textContent = key;
+            selectEl.appendChild(option);
+        }
+
+        // 預設選取第一筆（羅馬書 3:23）
+        onSelectVerse();
+    };
+
+    // 切換下拉選單經文
+    function onSelectVerse() {
+        const selectedKey = document.getElementById("verseSelect").value;
+        currentVerseText = adminDatabase[selectedKey];
+        document.getElementById("verseTitle").innerText = selectedKey;
+        
+        // 切換經文時，自動重置為預設的填充題模式
+        currentMode = "blank";
+        resetButtonStyles();
+        
+        updateStats();
+        renderVerse();
+    }
+
+    // 計算字數與標點符號數
+    function updateStats() {
+        let charCount = 0;
+        let punctCount = 0;
+
+        for (let char of currentVerseText) {
+            if (punctRegex.test(char)) {
+                punctCount++;
+            } else {
+                charCount++;
+            }
+        }
+
+        document.getElementById("charCount").innerText = charCount;
+        document.getElementById("punctCount").innerText = punctCount;
+    }
+
+    // 重置按鈕高亮狀態
+    function resetButtonStyles() {
+        document.getElementById('btnRandom').classList.remove('active');
+        document.getElementById('btnFull').classList.remove('active');
+    }
+
+    // 切換按鈕模式
+    function setMode(mode) {
+        // 若再次點擊目前啟用的按鈕，則切換回預設的全填充狀態
+        if (currentMode === mode) {
+            currentMode = "blank";
+            resetButtonStyles();
+        } else {
+            currentMode = mode;
+            resetButtonStyles();
+            if (mode === 'random') document.getElementById('btnRandom').classList.add('active');
+            if (mode === 'full') document.getElementById('btnFull').classList.add('active');
+        }
+
+        renderVerse();
+    }
+
+    // 渲染經文畫面
+    function renderVerse() {
+        const display = document.getElementById("displayText");
+        let html = "";
+
+        for (let i = 0; i < currentVerseText.length; i++) {
+            const char = currentVerseText[i];
+
+            // 標點符號一律保留顯示
+            if (punctRegex.test(char)) {
+                html += `<span class="punct">${char}</span>`;
+                continue;
+            }
+
+            // 依模式渲染字詞
+            switch (currentMode) {
+                case "blank": // 預設：全填充題（底線）
+                    html += `<span class="blank"></span>`;
+                    break;
+
+                case "random": // 隨機遮蔽 50% 字詞
+                    if (Math.random() > 0.5) {
+                        html += `<span class="blank"></span>`;
+                    } else {
+                        html += char;
+                    }
+                    break;
+
+                case "full": // 顯示全文
+                    html += char;
+                    break;
+            }
+        }
+
+        display.innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
